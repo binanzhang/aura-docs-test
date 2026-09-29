@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create SLA Domain · Aura Design System</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   Same Aura theme layer as the Page Notification preview — one
+   token source, two pages. This is the point: pattern-level and
+   component-level docs share the same visual system for free.
+   ═══════════════════════════════════════════════════════════════ */
+:root[data-theme="dark"]{
+  --surface-primary:#08152B; --surface-secondary:#0D1F3C; --surface-tertiary:#132A4E;
+  --surface-raised:#18355F; --border-subtle:#1E3B66; --border-strong:#2A508A;
+  --text-strong:#EEF3FB; --text-moderate:#A9BEDC; --text-subtle:#6E86AC;
+  --accent:#4DAEF7; --accent-quiet:#16345C;
+  --status-info:#4DAEF7; --status-success:#2EBD8E; --status-warning:#E8B33C; --status-critical:#E5484D;
+  --shadow:0 6px 20px rgba(0,0,0,.45);
+  --code-bg:#061020;
+}
+:root[data-theme="bright"]{
+  --surface-primary:#FFFFFF; --surface-secondary:#F5F8FC; --surface-tertiary:#FFFFFF;
+  --surface-raised:#FFFFFF; --border-subtle:#DCE5F0; --border-strong:#B9CBE2;
+  --text-strong:#0B1A33; --text-moderate:#475A76; --text-subtle:#7C8DA6;
+  --accent:#0B6FC4; --accent-quiet:#E8F1FB;
+  --status-info:#0B6FC4; --status-success:#0E8F68; --status-warning:#B3810F; --status-critical:#C32C31;
+  --shadow:0 4px 14px rgba(11,26,51,.10);
+  --code-bg:#F0F4F9;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--surface-primary); color:var(--text-strong);
+  font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font:13.5px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--code-bg);
+  border:1px solid var(--border-subtle);border-radius:4px;padding:1.5px 6px;color:var(--text-strong)}
+
+.topbar{position:sticky;top:0;z-index:20;height:58px;display:flex;align-items:center;gap:26px;
+  padding:0 22px;background:var(--surface-secondary);border-bottom:1px solid var(--border-subtle)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:660;font-size:15px;letter-spacing:-.2px}
+.mark{width:24px;height:24px;border-radius:6px;
+  background:linear-gradient(135deg,var(--status-info),var(--status-success))}
+.topnav{display:flex;gap:20px;font-size:13px;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text-subtle);font-weight:600}
+.topnav a{color:inherit}
+.topnav a.on{color:var(--text-strong)}
+.topnav a.on::after{content:"";display:block;height:2px;background:var(--accent);margin-top:6px;border-radius:2px}
+.spacer{flex:1}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface-primary);
+  border:1px solid var(--border-subtle);border-radius:8px;padding:7px 11px;font-size:13px;
+  color:var(--text-subtle);min-width:210px}
+.kbd{margin-left:auto;font-size:10.5px;border:1px solid var(--border-subtle);border-radius:4px;
+  padding:1px 5px;color:var(--text-subtle)}
+.tgl{background:var(--surface-primary);border:1px solid var(--border-subtle);color:var(--text-moderate);
+  border-radius:8px;padding:7px 13px;font-size:12.5px;cursor:pointer;font-weight:600}
+.tgl:hover{border-color:var(--accent);color:var(--text-strong)}
+
+.shell{display:grid;grid-template-columns:262px minmax(0,1fr) 216px;gap:0;
+  max-width:1560px;margin:0 auto;align-items:start}
+@media(max-width:1180px){.shell{grid-template-columns:240px minmax(0,1fr)}.toc{display:none}}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.side{display:none}}
+
+.side{position:sticky;top:58px;max-height:calc(100vh - 58px);overflow-y:auto;
+  padding:24px 14px 60px;border-right:1px solid var(--border-subtle)}
+.sgroup{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-subtle);
+  font-weight:700;margin:20px 0 7px;padding-left:10px}
+.sgroup:first-child{margin-top:0}
+.side a{display:block;padding:5.5px 10px;border-radius:6px;font-size:13.5px;color:var(--text-moderate)}
+.side a:hover{background:var(--surface-secondary);color:var(--text-strong);text-decoration:none}
+.side a.on{background:var(--accent-quiet);color:var(--text-strong);font-weight:620}
+.side .nest{padding-left:20px}
+
+.main{padding:34px 46px 90px;min-width:0}
+@media(max-width:860px){.main{padding:26px 20px 70px}}
+.crumb{font-size:12.5px;color:var(--text-subtle);margin-bottom:14px}
+h1{font-size:40px;line-height:1.15;letter-spacing:-.9px;margin:0 0 12px;font-weight:700}
+.lede{font-size:18px;line-height:1.6;color:var(--text-moderate);margin:0 0 20px;max-width:70ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:34px}
+.pill{font-size:11.5px;border:1px solid var(--border-subtle);border-radius:20px;padding:3.5px 11px;
+  color:var(--text-subtle);background:var(--surface-secondary)}
+.pill a{color:var(--accent)}
+h2{font-size:25px;letter-spacing:-.4px;margin:46px 0 14px;padding-bottom:9px;
+  border-bottom:1px solid var(--border-subtle);font-weight:680}
+h3{font-size:18px;margin:30px 0 10px;font-weight:660}
+p{max-width:72ch}
+ul.tight{max-width:72ch;padding-left:20px}
+ul.tight li{margin-bottom:7px}
+
+/* ── step list ── */
+.steps{counter-reset:step;list-style:none;padding:0;margin:18px 0;max-width:72ch}
+.step{counter-increment:step;position:relative;padding:0 0 22px 42px;border-left:2px solid var(--border-subtle)}
+.step:last-child{border-color:transparent;padding-bottom:2px}
+.step::before{content:counter(step);position:absolute;left:-15px;top:0;width:28px;height:28px;
+  border-radius:50%;background:var(--accent-quiet);color:var(--accent);font-weight:700;font-size:13px;
+  display:grid;place-items:center;border:1px solid var(--border-strong)}
+.step .sn{font-weight:660;font-size:16px;margin-bottom:4px}
+.step .sg{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-subtle);
+  margin-bottom:5px}
+.step p{margin:0;font-size:14.5px;color:var(--text-moderate)}
+.gap{color:var(--status-warning);font-style:italic}
+
+/* ── states (tab-equivalent) ── */
+.states{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:760px){.states{grid-template-columns:1fr}}
+.statec{border:1px solid var(--border-subtle);border-radius:8px;padding:11px 13px;background:var(--surface-secondary)}
+.statec .sv{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--text-subtle);margin-bottom:4px}
+.statec p{margin:0;font-size:13.5px;color:var(--text-moderate)}
+
+/* ── admonitions ── */
+.adm{border-left:3px solid;border-radius:8px;padding:13px 16px;margin:18px 0;max-width:72ch;
+  background:var(--surface-secondary)}
+.adm .t{font-size:12px;text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:5px}
+.adm p{margin:0;font-size:14.5px;color:var(--text-moderate)}
+.adm.note{border-color:var(--status-info)} .adm.note .t{color:var(--status-info)}
+.adm.caution{border-color:var(--status-warning)} .adm.caution .t{color:var(--status-warning)}
+
+/* ── image placeholder ── */
+.imgph{border:1px dashed var(--border-strong);border-radius:10px;padding:30px;text-align:center;
+  background:var(--surface-secondary);margin:18px 0;max-width:72ch}
+.imgph .ic{font-size:22px;margin-bottom:7px;opacity:.6}
+.imgph .l{font-size:13px;color:var(--text-subtle)}
+
+/* ── notification callout (reused component, shown inline) ── */
+.canvas{background:var(--surface-secondary);border:1px solid var(--border-subtle);border-radius:12px;
+  padding:22px;margin:18px 0 10px;display:flex;flex-direction:column;gap:13px}
+.note{display:flex;gap:12px;align-items:flex-start;background:var(--surface-tertiary);
+  border-radius:10px;padding:13px 40px 13px 0;box-shadow:var(--shadow);position:relative;max-width:560px}
+.note .ind{width:4px;align-self:stretch;flex:0 0 auto}
+.note .ico{width:22px;height:22px;border-radius:50%;flex:0 0 auto;margin:2px 0 0 12px;
+  display:grid;place-items:center;font-size:12.5px;font-weight:800;color:#06172E}
+.note .body{font-size:14px;line-height:1.55;color:var(--text-strong);padding-top:1px}
+.note .body a{font-weight:600}
+.note .x{position:absolute;top:11px;right:13px;width:16px;height:16px;color:var(--text-subtle);
+  font-size:13px;line-height:16px;text-align:center;cursor:pointer}
+.cap{font-size:12px;color:var(--text-subtle);margin-top:2px}
+
+/* ── related ── */
+.rel{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:18px 0}
+@media(max-width:760px){.rel{grid-template-columns:1fr}}
+.relc{border:1px solid var(--border-subtle);border-radius:10px;padding:15px;
+  background:var(--surface-secondary)}
+.relc .n{font-weight:640;font-size:15px;margin-bottom:4px}
+.relc p{margin:0;font-size:13.5px;color:var(--text-moderate)}
+
+.pgfoot{margin-top:52px;padding-top:20px;border-top:1px solid var(--border-subtle);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.editlink{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600}
+.lastmod{font-size:12.5px;color:var(--text-subtle)}
+
+.toc{position:sticky;top:58px;max-height:calc(100vh - 58px);overflow-y:auto;padding:34px 18px 60px}
+.toc .h{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-subtle);
+  font-weight:700;margin-bottom:10px}
+.toc a{display:block;font-size:13px;color:var(--text-moderate);padding:4px 0 4px 11px;
+  border-left:2px solid var(--border-subtle)}
+.toc a:hover{color:var(--text-strong);text-decoration:none}
+.toc a.on{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc a.sub{padding-left:22px;font-size:12.5px}
+
+.banner{background:linear-gradient(90deg,#16345C,#0D1F3C);border-bottom:1px solid var(--border-strong);
+  padding:9px 22px;font-size:12.5px;color:#BBD3F0;display:flex;gap:9px;align-items:center}
+:root[data-theme="bright"] .banner{background:linear-gradient(90deg,#E8F1FB,#F5F8FC);color:#3C5A80}
+.banner b{color:var(--text-strong)}
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <span>◆</span>
+  <span><b>Phase 0 visual proof — pattern level</b> — same token layer as the Page Notification page, a
+  different content type (a multi-step product flow, not a component). Content is verbatim from the live
+  Create SLA Domain page; unfilled gaps below are left visible, not papered over.</span>
+</div>
+
+<div class="topbar">
+  <div class="brand"><div class="mark"></div>Aura Design System</div>
+  <nav class="topnav">
+    <a href="#">Home</a>
+    <a href="#" class="on">Design</a>
+    <a href="#">Research</a>
+    <a href="#">Writing</a>
+    <a href="#">Resources</a>
+  </nav>
+  <div class="spacer"></div>
+  <div class="search">🔍 Search across Aura<span class="kbd">⌘K</span></div>
+  <button class="tgl" id="tgl">◐ Bright</button>
+</div>
+
+<div class="shell">
+
+  <aside class="side">
+    <div class="sgroup">Design</div>
+    <a href="#">Foundations</a>
+    <a href="#">Components</a>
+    <a href="#">Patterns</a>
+    <div class="sgroup">Components</div>
+    <a href="#">Overview</a>
+    <a href="#">Buttons</a>
+    <a href="#">Cards</a>
+    <a href="#">Chips</a>
+    <a href="#">Forms</a>
+    <a href="#">Inputs</a>
+    <div class="sgroup">Notifications</div>
+    <a href="index.html" class="nest">Page Notification</a>
+    <div class="sgroup">Patterns · Product Flows</div>
+    <a href="sla-domain.html" class="nest on">Create SLA Domain</a>
+    <a href="#" class="nest">Manage Protection</a>
+  </aside>
+
+  <main class="main">
+    <div class="crumb">Design › Patterns › Product Flows › Create SLA Domain</div>
+    <h1>Create SLA Domain</h1>
+    <p class="lede">
+      SLA Domains are policies that define how objects in RSC are backed up. In this flow, users set up an
+      SLA Domain based on their requirements.
+    </p>
+    <div class="meta">
+      <span class="pill">Type: Pattern → Product flow</span>
+      <span class="pill"><a href="#">Figma ↗</a></span>
+      <span class="pill">Updated Oct 2024</span>
+      <span class="pill">Owners: yuki.zhang, anara, noa</span>
+    </div>
+
+    <h2 id="goal">Goal &amp; preconditions</h2>
+    <p><strong>Goal:</strong> create a custom SLA Domain to streamline and customize workload protection.</p>
+    <p><strong>Actors:</strong> RSC user/admin.</p>
+    <p><strong>Precondition:</strong> for archival, archival locations must first be added in RSC settings.</p>
+
+    <h2 id="core-flow">Core flow</h2>
+    <p>Five core steps, which apply to all object types in RSC.</p>
+    <ol class="steps">
+      <li class="step">
+        <div class="sn">Select object types</div>
+        <p>The user selects one or more object types that can be protected by this SLA Domain.</p>
+      </li>
+      <li class="step">
+        <div class="sn">Frequency and retention</div>
+        <p><span class="gap">[NEEDS TEXT — behind tab]</span> how often backups run and how long they're kept.</p>
+      </li>
+      <li class="step">
+        <div class="sn">Archival</div>
+        <div class="sg">Secondary backups</div>
+        <p>Set up an archival policy to store data long-term in a cost-effective location. The policy
+          defines: (1) the source location data is archived from, (2) the archival location where it's
+          stored, and (3) when data is sent there. Requires archival locations already added in RSC
+          settings.</p>
+        <div class="states">
+          <div class="statec"><div class="sv">Archival enabled</div>
+            <p>Input fields appear progressively for a smooth experience.</p></div>
+          <div class="statec"><div class="sv">Archival disabled</div>
+            <p class="gap">[NEEDS TEXT — behind tab]</p></div>
+        </div>
+      </li>
+      <li class="step">
+        <div class="sn">Replication</div>
+        <div class="sg">Secondary backups</div>
+        <p>Configure a replication policy to store data in more than one location, generally to ensure a
+          copy survives a disaster. The policy defines the replication target and how long data is
+          retained there.</p>
+        <div class="states">
+          <div class="statec"><div class="sv">Replication enabled</div>
+            <p>User configures the replication target and the retention period.</p></div>
+          <div class="statec"><div class="sv">Replication disabled</div>
+            <p class="gap">[NEEDS TEXT — behind tab]</p></div>
+        </div>
+      </li>
+      <li class="step">
+        <div class="sn">Confirmation</div>
+        <p><span class="gap">[NEEDS TEXT — behind tab]</span> review and confirm the SLA Domain.</p>
+      </li>
+    </ol>
+    <div class="adm caution">
+      <div class="t">⚠ Real, visible gaps</div>
+      <p>Three of the five core steps have content that sits behind unclicked tabs on the live site and
+        couldn't be captured. That's the honest state of today's docs — a docs-as-code page doesn't
+        invent the missing text, it just makes the gap visible and trackable instead of silently absent.</p>
+    </div>
+    <div class="imgph">
+      <div class="ic">🖼</div>
+      <div class="l">Per-step Figma frames — referenced on the live page, not yet attached here</div>
+    </div>
+
+    <h2 id="optional">Optional steps</h2>
+    <ol class="steps">
+      <li class="step">
+        <div class="sn">FTUX Introduction</div>
+        <div class="sg">When: first-time users</div>
+        <p>Describes SLA Domains and key concepts. Users can check "Do not show again" (bottom-left of the
+          modal) to skip this page.</p>
+      </li>
+      <li class="step">
+        <div class="sn">Object Type Details</div>
+        <div class="sg">When: some object types allow configuring more backups; varies by object</div>
+        <p>Shown after the Replication step and before Retention Lock. Example: vSphere VMs (virtual
+          machines).</p>
+      </li>
+      <li class="step">
+        <div class="sn">Retention Lock</div>
+        <p>Ensures snapshots aren't deleted during the retention period, whether by accident or by bad
+          actors. Used in governance or compliance mode.</p>
+        <div class="states">
+          <div class="statec"><div class="sv">Governance mode</div>
+            <p>Reducing the SLA Domain's retention period requires approval of at least two users.</p></div>
+          <div class="statec"><div class="sv">Compliance mode</div>
+            <p class="gap">[NEEDS TEXT — behind tab]</p></div>
+        </div>
+      </li>
+    </ol>
+
+    <h2 id="outcome">Where this ends up: a page notification</h2>
+    <p>Completing or failing this flow surfaces through the exact same component documented on the
+      <a href="index.html">Page Notification</a> page — these aren't placeholder examples, they're the
+      real messages used at the end of this flow:</p>
+    <div class="canvas">
+      <div class="note">
+        <div class="ind" style="background:var(--status-success)"></div>
+        <div class="ico" style="background:var(--status-success)">✓</div>
+        <div class="body">SLA Domain created successfully.</div><div class="x">✕</div>
+      </div>
+      <div class="note">
+        <div class="ind" style="background:var(--status-critical)"></div>
+        <div class="ico" style="background:var(--status-critical)">✕</div>
+        <div class="body">Couldn't create SLA Domain. <a href="index.html">Review settings</a></div><div class="x">✕</div>
+      </div>
+    </div>
+    <div class="cap">The component doc and this flow doc were built independently, from independently
+      pasted real content — the match is a genuine cross-reference in the product, not a coincidence.</div>
+
+    <h2 id="related">Related concepts &amp; flows</h2>
+    <div class="rel">
+      <div class="relc"><div class="n"><a href="#">SLA Domain administration →</a></div>
+        <p>Concept — managing SLA Domains once created.</p></div>
+      <div class="relc"><div class="n"><a href="#">Workload-specific settings for SLA Domains →</a></div>
+        <p>Concept — per-object-type configuration.</p></div>
+      <div class="relc"><div class="n"><a href="#">Manage Protection →</a></div>
+        <p>Related flow — how an object is protected by Rubrik; used across all object types.</p></div>
+      <div class="relc"><div class="n"><a href="index.html">Page Notification →</a></div>
+        <p>Component — the success/critical feedback shown above.</p></div>
+    </div>
+
+    <div class="pgfoot">
+      <a class="editlink" href="#">✏️ Edit this page</a>
+      <span class="lastmod">Last updated Oct 2024 · <a href="#">history</a></span>
+    </div>
+  </main>
+
+  <nav class="toc">
+    <div class="h">On this page</div>
+    <a href="#goal" class="on">Goal &amp; preconditions</a>
+    <a href="#core-flow">Core flow</a>
+    <a href="#optional">Optional steps</a>
+    <a href="#outcome">Page notification outcome</a>
+    <a href="#related">Related concepts &amp; flows</a>
+  </nav>
+</div>
+
+<script>
+const root=document.documentElement, t=document.getElementById('tgl');
+t.onclick=()=>{
+  const bright = root.getAttribute('data-theme')==='bright';
+  root.setAttribute('data-theme', bright?'dark':'bright');
+  t.textContent = bright?'◐ Bright':'◑ Dark';
+};
+const links=[...document.querySelectorAll('.toc a')];
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.remove('on'));
+      const m=links.find(l=>l.getAttribute('href')==='#'+e.target.id);
+      if(m) m.classList.add('on');
+    }
+  });
+},{rootMargin:'-70px 0px -75% 0px'});
+document.querySelectorAll('h2[id]').forEach(h=>obs.observe(h));
+</script>
+</body>
+</html>
